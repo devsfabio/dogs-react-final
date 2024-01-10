@@ -11,13 +11,17 @@ export const UserStorage = ({ children }) => {
   const [error, setError] = React.useState(null);
   const navigate = useNavigate();
 
-  const userLogout = React.useCallback(async function userLogout() {
-    setData(null);
-    setError(null);
-    setLoading(false);
-    setLogin(false);
-    window.localStorage.removeItem('token');
-  }, []);
+  const userLogout = React.useCallback(
+    async function userLogout() {
+      setData(null);
+      setError(null);
+      setLoading(false);
+      setLogin(false);
+      window.localStorage.removeItem('token');
+      navigate('/login');
+    },
+    [navigate],
+  );
 
   async function getUser(token) {
     const { url, options } = USER_GET(token);
@@ -25,7 +29,6 @@ export const UserStorage = ({ children }) => {
     const json = await response.json();
     setData(json);
     setLogin(true);
-    console.log(json);
   }
 
   async function userLogin(username, password) {
@@ -36,7 +39,7 @@ export const UserStorage = ({ children }) => {
       const tokenRes = await fetch(url, options);
       if (!tokenRes.ok) throw new Error(`Error: Usuário inválido`);
       const { token } = await tokenRes.json();
-      window.localStorage.getItem('token', token);
+      window.localStorage.setItem('token', token);
       await getUser(token);
       navigate('/conta');
     } catch (err) {
